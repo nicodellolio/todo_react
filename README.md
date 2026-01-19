@@ -1,16 +1,42 @@
-# React + Vite
+# Todo React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Applicazione semplice per la gestione di una lista di cose da fare, sviluppata con React
 
-Currently, two official plugins are available:
+## Caratteristiche
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Visualizzazione di una lista di attività
+- Aggiunta di nuove attività
+- Possibilità di segnare le attività come completate
+- Rimozione delle attività non più necessarie
 
-## React Compiler
+## Requisiti
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js (versione recente consigliata, ad es. >= 18)
+- NPM o Yarn installati sul sistema
 
-## Expanding the ESLint configuration
+## Installazione
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Clona il repository e installa le dipendenze:
+
+//bash
+git clone https://github.com/<tuo-username>/todo_react.git
+cd todo_react
+npm install
+
+## Avvio dell'applicazione
+
+Avvia il server di sviluppo (controlla gli script disponibili in `package.json`):
+
+## Struttura del progetto (sintetica)
+
+- `src/` – codice sorgente React
+  - `App.jsx` – componente principale dell’applicazione
+  - altri componenti e risorse
+- `public/` – asset pubblici
+- `package.json` – dipendenze e script del progetto
+
+## Come contribuire
+
+1. Crea un nuovo branch per la tua modifica
+2. Esegui i test o verifica che l’app giri correttamente
+3. Apri una Pull Request descrivendo le modifiche effettuate
