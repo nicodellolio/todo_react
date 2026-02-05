@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Todo React",
+    "slug": "todo_react",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "scheme": "todo",
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "bundleIdentifier": "com.nicoladellolio.todo",
+      "buildNumber": "1.0.4",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "75c6ca4b-569f-4336-a2a3-88053a181115"
+      }
+    }
+  }
+}
