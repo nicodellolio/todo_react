@@ -12,6 +12,9 @@ import {
   getSleepResults,
   saveSleepResults,
   clearSleepResults,
+  getActiveSleepSession,
+  saveActiveSleepSession,
+  clearActiveSleepSession,
 } from "../utils/storage";
 import { SleepResult } from "../types";
 
@@ -62,9 +65,11 @@ export default function SleepSchedule() {
 
   const handleSleepStart = () => {
     if (!sleepStart) {
-      setCurrentTime(new Date().toLocaleTimeString("it-IT"));
-      setSleepStart(new Date());
+      const start = new Date();
+      setCurrentTime(start.toLocaleTimeString("it-IT"));
+      setSleepStart(start);
       setTimeSpentSleeping("00h:00m");
+      saveActiveSleepSession({ startedAt: start.toISOString() });
     }
   };
 
@@ -85,6 +90,7 @@ export default function SleepSchedule() {
       setResults((prev) => [...prev, result]);
       setSleepStart(null);
       setTimeSpentSleeping(null);
+      clearActiveSleepSession();
     }
   };
 
@@ -114,10 +120,32 @@ export default function SleepSchedule() {
   const isSleeping = sleepStart !== null;
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  const sortSleepResults = (items: SleepResult[]) =>
+    [...items].sort((a, b) => Number(b.id) - Number(a.id));
+
+  useEffect(() => {
+    const restoreActiveSession = async () => {
+      const active = await getActiveSleepSession();
+      if (!active) return;
+
+      const startDate = new Date(active.startedAt);
+      if (Number.isNaN(startDate.getTime())) {
+        await clearActiveSleepSession();
+        return;
+      }
+
+      setSleepStart(startDate);
+      const diffMs = Date.now() - startDate.getTime();
+      setTimeSpentSleeping(formatDuration(diffMs));
+    };
+
+    restoreActiveSession();
+  }, []);
+
   useEffect(() => {
     const loadResults = async () => {
       const storedResults = await getSleepResults();
-      setResults(storedResults);
+      setResults(sortSleepResults(storedResults));
     };
     loadResults();
   }, []);
@@ -160,16 +188,37 @@ export default function SleepSchedule() {
     ]);
   };
 
-  const getHoursFromDuration = (duration: string | null) => {
+  const getMinutesFromDuration = (duration: string | null) => {
     if (!duration) return 0;
-    const match = duration.match(/^(\d{2})h/);
-    return match ? parseInt(match[1], 10) : 0;
+    const match = duration.match(/^(\d{2})h:(\d{2})m$/);
+    if (!match) return 0;
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return 0;
+    return hours * 60 + minutes;
+  };
+
+  const handleShowAverageSleep = () => {
+    if (!results.length) return;
+    const totalMinutes = results.reduce((sum, item) => {
+      return sum + getMinutesFromDuration(item.duration);
+    }, 0);
+    const averageMinutes = Math.round(totalMinutes / results.length);
+    const hours = Math.floor(averageMinutes / 60);
+    const minutes = averageMinutes % 60;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const formatted = `${pad(hours)}h:${pad(minutes)}m`;
+
+    Alert.alert(
+      "Media sonno",
+      `Media delle ultime ${results.length} notti: ${formatted}`,
+    );
   };
 
   return (
     <View className="flex flex-col">
-      <Text className="text-[4rem] mx-auto font-black text-white py-4 px-2 mt-4">
-        Time to Sleep!
+      <Text className="text-[3.2rem] mx-auto font-black text-white py-4 px-2 mt-4">
+        SLEEP SCHEDULE
       </Text>
       <View className="buttons w-100 flex flex-col mt-5">
         <TouchableOpacity
@@ -202,6 +251,7 @@ export default function SleepSchedule() {
           disabled={!isSleeping}
           className={`${!isSleeping ? "bg-gray-800 py-8 opacity-40" : "bg-blue-300 py-16"} mt-6 mx-auto w-[75%] rounded-3xl`}
           onPress={handleWakeUp}
+          onLongPress={handleShowAverageSleep}
         >
           <Text className="font-semibold text-[3rem] text-center">
             Shit, wake up!
@@ -216,12 +266,12 @@ export default function SleepSchedule() {
           data={results}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
-            const hoursSlept = getHoursFromDuration(item.duration);
+            const minutesSlept = getMinutesFromDuration(item.duration);
 
             const sleepQuality =
-              hoursSlept >= 8
+              minutesSlept >= 450 //7 ore e mezza
                 ? "text-green-500"
-                : hoursSlept < 6
+                : minutesSlept < 360 //6 ore
                   ? "text-orange-500"
                   : "text-white";
 
@@ -233,8 +283,10 @@ export default function SleepSchedule() {
                 }
                 onLongPress={() => deleteSleepSchedule(item.id)}
               >
-                <Text className={`${sleepQuality} text-[22px] font-semibold text-center`}>
-                  {item.dateLabel} {item.duration}
+                <Text
+                  className={`${sleepQuality} text-[22px] text-center`}
+                >
+                  {item.dateLabel}: {item.duration}
                 </Text>
                 {expandedId === item.id && item.startTime && item.endTime ? (
                   <Text className={`${sleepQuality} text-lg text-center mt-1`}>

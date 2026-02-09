@@ -14,12 +14,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BackgroundContext } from "./_layout";
 
 export default function Home() {
+  //states
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [showChangingBg, setShowChangingBg] = useState<boolean>(false);
+  const [changingBgVisible, setChangingBgVisible] = useState<boolean>(false);
+  const [toggleMenu, setToggleMenu] = useState<boolean>(false);
+
   const background = useContext(BackgroundContext);
-  const [showChangingBg, setShowChangingBg] = useState(false);
-  const [changingBgVisible, setChangingBgVisible] = useState(false);
   const changingBgAnim = useRef(new Animated.Value(0)).current;
+  const menuAnim = useRef(new Animated.Value(0)).current;
   const todayDate = new Date()
     .toLocaleDateString("it-IT", {
       weekday: "long",
@@ -36,7 +40,7 @@ export default function Home() {
   const loadTodos = async () => {
     const data = await getTodos();
     setTodos(data);
-  };
+  };2
 
   useFocusEffect(
     useCallback(() => {
@@ -103,7 +107,7 @@ export default function Home() {
     setTimeout(() => {
       background.next();
       setShowChangingBg(false);
-    }, 1500);
+    }, 750);
   };
 
   useEffect(() => {
@@ -129,6 +133,14 @@ export default function Home() {
       });
     }
   }, [showChangingBg, changingBgVisible, changingBgAnim]);
+
+  useEffect(()=>{
+    Animated.timing(menuAnim, {
+      toValue: toggleMenu ? 1 : 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  },[toggleMenu, menuAnim])
 
   return (
     <SafeAreaView className="flex-1 px-5 relative" edges={["top"]}>
@@ -182,51 +194,95 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       )}
-      {changingBgVisible && (
+
+      <View className="absolute bottom-10 right-5 items-end">
         <Animated.View
-          className="absolute bottom-10 right-20 items-center gap-3 flex flex-row bg-green-700 py-2 px-3 rounded-full"
           style={{
-            opacity: changingBgAnim,
+            opacity: menuAnim,
             transform: [
               {
-                translateX: changingBgAnim.interpolate({
+                translateY: menuAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [60, 0],
-                }),
-              },
-              {
-                scale: changingBgAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.5, 1],
+                  outputRange: [20, 0],
                 }),
               },
             ],
           }}
         >
-          <View
-            className="w-[30px] h-[30px] rounded-full border-2 border-transparent animate-spin"
-            style={{
-              borderTopColor: "#cecfffff",
-              borderRightColor: "#cecfffff",
-            }}
-          />
-          <Text className="text-2xl text-white">Aggiornando lo sfondo</Text>
+          <View className="gap-y-2 mb-3 items-end">
+            <Link onPress={()=>setToggleMenu(false)} href="/sleep-schedule" asChild>
+              <TouchableOpacity className="bg-blue-200 rounded-full px-3 py-2">
+                <Text className="text-4xl pb-1 px-[3px]">
+                  🥱<Text className="text-[18px]"> Sleeping Schedule</Text>
+                </Text>
+              </TouchableOpacity>
+            </Link>
+
+            {changingBgVisible ? (
+              <Animated.View
+                className="items-center gap-3 flex flex-row bg-green-700 py-2 px-3 rounded-full"
+                style={{
+                  opacity: changingBgAnim,
+                  transform: [
+                    {
+                      translateX: changingBgAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [60, 0],
+                      }),
+                    },
+                    {
+                      scale: changingBgAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0.5, 1],
+                      }),
+                    },
+                  ],
+                }}
+              >
+                <View
+                  className="w-[30px] h-[30px] rounded-full border-2 border-transparent animate-spin"
+                  style={{
+                    borderTopColor: "#cecfffff",
+                    borderRightColor: "#cecfffff",
+                  }}
+                />
+                <Text className="text-2xl text-white">
+                  Aggiornando lo sfondo
+                </Text>
+              </Animated.View>
+            ) : (
+              <TouchableOpacity
+                className="bg-green-600 rounded-full py-[8px] px-3 w-100"
+                onPress={handleChangeBackground}
+              >
+                <Text className="text-3xl pb-1">
+                  🖼️<Text className="text-xl"> Change Background</Text>
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </Animated.View>
-      )}
-      <View className="absolute bottom-10 right-5 flex gap-y-2">
-        <Link href="/sleep-schedule" asChild>
-          <TouchableOpacity className="bg-blue-200 rounded-full px-2 py-2">
-            <Text className="text-4xl">🥱</Text>
-          </TouchableOpacity>
-        </Link>
 
         <TouchableOpacity
-          className="bg-green-700 rounded-full"
-          onPress={handleChangeBackground}
+          onPress={() => setToggleMenu((prev) => !prev)}
+          className="bg-blue-600/90 rounded-full px-[8px] pb-[5px] pt-[7px]"
         >
-          <Text className="text-4xl p-2">🖼️</Text>
+          <Animated.Text
+            className="text-5xl text-white"
+            style={{
+              transform: [
+                {
+                  rotate: menuAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["0deg", "90deg"],
+                  }),
+                },
+              ],
+            }}
+          >
+            ☰
+          </Animated.Text>
         </TouchableOpacity>
-
       </View>
     </SafeAreaView>
   );

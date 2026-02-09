@@ -2,7 +2,10 @@ import "../global.css";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ImageBackground, View } from "react-native";
-import { createContext, useMemo, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
+import * as SplashScreen from "expo-splash-screen";
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const BACKGROUNDS = [
   require("../assets/backgrounds/1.jpg"),
@@ -46,6 +49,13 @@ export default function Layout() {
     }),
     [index],
   );
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      SplashScreen.hideAsync().catch(() => {});
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
     <BackgroundContext.Provider value={value}>

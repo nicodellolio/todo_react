@@ -23,3 +23,7 @@ export type SleepResult = {
   startTime?: string;
   endTime?: string;
 };
+
+export type ActiveSleepSession = {
+  startedAt: string;
+};

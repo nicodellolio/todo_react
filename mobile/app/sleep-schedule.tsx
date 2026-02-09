@@ -6,16 +6,18 @@ const SLEEP_BACKGROUND = require("../assets/backgrounds/11.jpg");
 
 export default function SleepScheduleScreen() {
   return (
-    <ImageBackground
-      source={SLEEP_BACKGROUND}
-      resizeMode="cover"
-      className="flex-1"
-    >
-      <View className="flex-1 bg-black/40">
-        <SafeAreaView className="flex-1 px-5">
-          <SleepSchedule />
-        </SafeAreaView>
-      </View>
-    </ImageBackground>
+    <View className="flex-1 bg-[#071927]">
+      <ImageBackground
+        source={SLEEP_BACKGROUND}
+        resizeMode="cover"
+        className="flex-1"
+      >
+        <View className="flex-1">
+          <SafeAreaView className="flex-1 px-5">
+            <SleepSchedule />
+          </SafeAreaView>
+        </View>
+      </ImageBackground>
+    </View>
   );
 }

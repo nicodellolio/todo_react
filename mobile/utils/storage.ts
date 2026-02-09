@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Todo, SleepResult } from '../types';
+import { Todo, SleepResult, ActiveSleepSession } from '../types';
 
 const STORAGE_KEYS = {
   TODOS: '@todos',
   SLEEP_RESULTS: '@sleep_results',
   LEGACY_SLEEP_RESULTS: '@sleepResults',
+  ACTIVE_SLEEP_SESSION: '@active_sleep_session',
 };
 
 export const getTodos = async (): Promise<Todo[]> => {
@@ -94,5 +95,40 @@ export const clearSleepResults = async () => {
     await AsyncStorage.removeItem(STORAGE_KEYS.SLEEP_RESULTS);
   } catch (e) {
     console.error('Error clearing sleep results', e);
+  }
+};
+
+export const getActiveSleepSession = async (): Promise<ActiveSleepSession | null> => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(
+      STORAGE_KEYS.ACTIVE_SLEEP_SESSION,
+    );
+    if (!jsonValue) return null;
+    return JSON.parse(jsonValue);
+  } catch (e) {
+    console.error('Error reading active sleep session', e);
+    return null;
+  }
+};
+
+export const saveActiveSleepSession = async (
+  session: ActiveSleepSession,
+): Promise<void> => {
+  try {
+    const jsonValue = JSON.stringify(session);
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.ACTIVE_SLEEP_SESSION,
+      jsonValue,
+    );
+  } catch (e) {
+    console.error('Error saving active sleep session', e);
+  }
+};
+
+export const clearActiveSleepSession = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem(STORAGE_KEYS.ACTIVE_SLEEP_SESSION);
+  } catch (e) {
+    console.error('Error clearing active sleep session', e);
   }
 };
