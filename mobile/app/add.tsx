@@ -32,7 +32,7 @@ export default function AddTodo() {
     <SafeAreaView className="flex-1 px-3">
       <View className="p-4 px-6 border-b border-gray-200 flex-row justify-between items-center">
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
-          <Text className="bg-blue-800 text-white rounded-full p-2 text-sm">Annulla</Text>
+          <Text className="bg-white text-red-600 rounded-full p-2 px-3 text-sm">Annulla</Text>
         </TouchableOpacity>
         <Text className="text-5xl font-bold text-white">Nuova attività</Text>
       </View>
@@ -40,7 +40,7 @@ export default function AddTodo() {
       <View className="p-6">
         <Text className="text-white text-lg mb-2 font-medium">Cosa bisogna fare?</Text>
         <TextInput
-          className="bg-gray-50 border border-gray-200 p-4 rounded-xl text-lg mb-6"
+          className="bg-gray-50 border border-gray-200 h-[50px] py-2 px-3 pb-4 rounded-xl text-lg mb-6"
           placeholder="es. Fare la spesa"
           value={text}
           onChangeText={setText}

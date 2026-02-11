@@ -50,11 +50,11 @@ export default function EditTodo() {
 
   return (
     <SafeAreaView className="flex-1">
-      <View className="p-4 border-b border-gray-200 flex-row items-center">
+      <View className="p-4 px-6 border-b border-gray-200 flex-row justify-between items-center">
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
-          <Text className="text-blue-600 text-lg">Annulla</Text>
+          <Text className="bg-white text-red-600 rounded-full p-2 px-3 text-sm">Annulla</Text>
         </TouchableOpacity>
-        <Text className="text-xl font-bold">Modifica attività</Text>
+        <Text className="text-[2.5rem] font-bold text-white">Modifica attività</Text>
       </View>
 
       <View className="p-6">

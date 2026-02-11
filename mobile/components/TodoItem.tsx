@@ -100,12 +100,12 @@ export default function TodoItem({
         <View className="px-4 pb-3 pt-1">
           <View className="w-full h-[1px] bg-gray-200/40" />
           <Text
-            className={`${wasNotCreatedToday ? "text-white/90" : "text-gray-500"} text-sm mt-2`}
+            className="text-white/90 text-sm mt-2"
           >
             Quest'attività non è di oggi, modificala o eliminala.
           </Text>
           <Text
-            className={`${wasNotCreatedToday ? "text-white/90" : "text-gray-500"} text-sm`}
+            className="text-white/90 text-gray-500 text-sm"
           >
             Data creazione: {createdAtFormatted}
           </Text>

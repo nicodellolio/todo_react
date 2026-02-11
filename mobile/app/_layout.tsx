@@ -7,7 +7,7 @@ import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-const BACKGROUNDS = [
+export const BACKGROUNDS = [
   require("../assets/backgrounds/1.jpg"),
   require("../assets/backgrounds/2.jpg"),
   require("../assets/backgrounds/3.jpg"),
@@ -18,11 +18,45 @@ const BACKGROUNDS = [
   require("../assets/backgrounds/8.jpg"),
   require("../assets/backgrounds/9.jpg"),
   require("../assets/backgrounds/10.jpg"),
+  require("../assets/backgrounds/11.jpg"),
+  require("../assets/backgrounds/12.jpg"),
+  require("../assets/backgrounds/13.jpg"),
+  require("../assets/backgrounds/14.jpg"),
+  require("../assets/backgrounds/15.jpg"),
+  require("../assets/backgrounds/16.jpg"),
+  require("../assets/backgrounds/17.jpg"),
+  require("../assets/backgrounds/18.jpg"),
+  require("../assets/backgrounds/19.jpg"),
+  require("../assets/backgrounds/20.jpg"),
+] as const;
+
+export const THUMB_BACKGROUNDS = [
+  require("../assets/backgrounds/thumbnails/1.jpg"),
+  require("../assets/backgrounds/thumbnails/2.jpg"),
+  require("../assets/backgrounds/thumbnails/3.jpg"),
+  require("../assets/backgrounds/thumbnails/4.jpg"),
+  require("../assets/backgrounds/thumbnails/5.jpg"),
+  require("../assets/backgrounds/thumbnails/6.jpg"),
+  require("../assets/backgrounds/thumbnails/7.jpg"),
+  require("../assets/backgrounds/thumbnails/8.jpg"),
+  require("../assets/backgrounds/thumbnails/9.jpg"),
+  require("../assets/backgrounds/thumbnails/10.jpg"),
+  require("../assets/backgrounds/thumbnails/11.jpg"),
+  require("../assets/backgrounds/thumbnails/12.jpg"),
+  require("../assets/backgrounds/thumbnails/13.jpg"),
+  require("../assets/backgrounds/thumbnails/14.jpg"),
+  require("../assets/backgrounds/thumbnails/15.jpg"),
+  require("../assets/backgrounds/thumbnails/16.jpg"),
+  require("../assets/backgrounds/thumbnails/17.jpg"),
+  require("../assets/backgrounds/thumbnails/18.jpg"),
+  require("../assets/backgrounds/thumbnails/19.jpg"),
+  require("../assets/backgrounds/thumbnails/20.jpg"),
 ] as const;
 
 type BackgroundContextValue = {
   index: number;
   next: () => void;
+  set: (index: number) => void;
 };
 
 export const BackgroundContext = createContext<BackgroundContextValue | null>(
@@ -46,6 +80,11 @@ export default function Layout() {
           }
           return nextIndex;
         }),
+      set: (i: number) => {
+        if (i >= 0 && i < BACKGROUNDS.length) {
+          setIndex(i);
+        }
+      },
     }),
     [index],
   );

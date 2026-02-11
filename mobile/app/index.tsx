@@ -1,4 +1,11 @@
-import { View, FlatList, Text, TouchableOpacity, Animated } from "react-native";
+import {
+  View,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  Animated,
+  Image,
+} from "react-native";
 import { useState, useCallback, useContext, useRef, useEffect } from "react";
 import { Link, useFocusEffect } from "expo-router";
 import {
@@ -11,15 +18,21 @@ import { Todo, TodoStats as TodoStatsType } from "../types";
 import TodoItem from "../components/TodoItem";
 import TodoStats from "../components/TodoStats";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BackgroundContext } from "./_layout";
+import { Asset } from "expo-asset";
+import { BackgroundContext, BACKGROUNDS, THUMB_BACKGROUNDS } from "./_layout";
 
 export default function Home() {
+  useEffect(() => {
+    Asset.loadAsync([...BACKGROUNDS, ...THUMB_BACKGROUNDS]).catch(() => {});
+  }, []);
   //states
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [showChangingBg, setShowChangingBg] = useState<boolean>(false);
   const [changingBgVisible, setChangingBgVisible] = useState<boolean>(false);
   const [toggleMenu, setToggleMenu] = useState<boolean>(false);
+  const [toggleBackgroundGrid, setToggleBackgroundGrid] =
+    useState<boolean>(false);
 
   const background = useContext(BackgroundContext);
   const changingBgAnim = useRef(new Animated.Value(0)).current;
@@ -40,7 +53,8 @@ export default function Home() {
   const loadTodos = async () => {
     const data = await getTodos();
     setTodos(data);
-  };2
+  };
+  2;
 
   useFocusEffect(
     useCallback(() => {
@@ -110,6 +124,12 @@ export default function Home() {
     }, 750);
   };
 
+  const handleSelectBackground = (idx: number) => {
+    if (!background) return;
+    background.set(idx);
+    setToggleBackgroundGrid(false);
+  };
+
   useEffect(() => {
     if (showChangingBg) {
       if (!changingBgVisible) {
@@ -134,21 +154,24 @@ export default function Home() {
     }
   }, [showChangingBg, changingBgVisible, changingBgAnim]);
 
-  useEffect(()=>{
+  useEffect(() => {
     Animated.timing(menuAnim, {
       toValue: toggleMenu ? 1 : 0,
       duration: 250,
       useNativeDriver: true,
     }).start();
-  },[toggleMenu, menuAnim])
+  }, [toggleMenu, menuAnim]);
 
   return (
-    <SafeAreaView className="flex-1 px-5 relative" edges={["top"]}>
+    <SafeAreaView
+      className="flex-1 px-5 relative brightness-10"
+      edges={["top"]}
+    >
       <View className="pt-4 px-1 flex-row justify-between items-center bg-transparent ">
         <Text className="leading-none text-5xl font-bold text-white">
           Attività di oggi
         </Text>
-        <Link href="/add" asChild>
+        <Link href="/add" onPress={()=>setToggleMenu(false)} asChild>
           <TouchableOpacity className="bg-blue-600 mt-2 px-4 py-[8px] rounded-full mb-3">
             <Text className="text-white text-xl font-bold">+</Text>
           </TouchableOpacity>
@@ -195,13 +218,13 @@ export default function Home() {
         </View>
       )}
 
-      <View className="absolute bottom-10 right-5 items-end">
+      <View className="absolute bottom-10 right-5 items-center flex-row">
         <Animated.View
           style={{
             opacity: menuAnim,
             transform: [
               {
-                translateY: menuAnim.interpolate({
+                translateX: menuAnim.interpolate({
                   inputRange: [0, 1],
                   outputRange: [20, 0],
                 }),
@@ -209,11 +232,15 @@ export default function Home() {
             ],
           }}
         >
-          <View className="gap-y-2 mb-3 items-end">
-            <Link onPress={()=>setToggleMenu(false)} href="/sleep-schedule" asChild>
-              <TouchableOpacity className="bg-blue-200 rounded-full px-3 py-2">
-                <Text className="text-4xl pb-1 px-[3px]">
-                  🥱<Text className="text-[18px]"> Sleeping Schedule</Text>
+          <View className="gap-x-1 mb-3 items-end flex flex-row me-1">
+            <Link
+              onPress={() => setToggleMenu(false)}
+              href="/sleep-schedule"
+              asChild
+            >
+              <TouchableOpacity className="bg-pink-500 rounded-full px-3 py-2">
+                <Text className="text-4xl px-[3px] text-white">
+                  <Text className="text-[18px]"> Sleeping Schedule</Text>
                 </Text>
               </TouchableOpacity>
             </Link>
@@ -252,23 +279,29 @@ export default function Home() {
               </Animated.View>
             ) : (
               <TouchableOpacity
-                className="bg-green-600 rounded-full py-[8px] px-3 w-100"
-                onPress={handleChangeBackground}
+                className="bg-green-600 rounded-full py-[12px] px-3 w-100"
+                onPress={() => {
+                  setToggleBackgroundGrid((prev) => !prev);
+                  setToggleMenu(false);
+                }}
               >
-                <Text className="text-3xl pb-1">
-                  🖼️<Text className="text-xl"> Change Background</Text>
+                <Text className="text-3xl text-white">
+                  <Text className="text-xl">Cambia Background</Text>
                 </Text>
               </TouchableOpacity>
             )}
           </View>
         </Animated.View>
-
         <TouchableOpacity
-          onPress={() => setToggleMenu((prev) => !prev)}
-          className="bg-blue-600/90 rounded-full px-[8px] pb-[5px] pt-[7px]"
+          onPress={() => {
+            setToggleMenu((prev) => !prev);
+            setToggleBackgroundGrid(false);
+          }}
+          className={`bg-blue-600/90 rounded-full mb-[11px]
+              ${toggleMenu ? "px-[15px] py-[10px] " : "px-[8px] pb-[5px] pt-[7px]"}`}
         >
           <Animated.Text
-            className="text-5xl text-white"
+            className={`${toggleMenu ? "text-3xl" : "text-5xl"} text-white`}
             style={{
               transform: [
                 {
@@ -280,10 +313,39 @@ export default function Home() {
               ],
             }}
           >
-            ☰
+            {toggleMenu ? "✕" : "☰"}
           </Animated.Text>
         </TouchableOpacity>
       </View>
+      {toggleBackgroundGrid && (
+        <View className="absolute bottom-20 mb-10 right-6 shadow h-[300px] w-[350px] bg-white/30 rounded-2xl pe-4">
+          <FlatList
+            data={THUMB_BACKGROUNDS}
+            numColumns={4}
+            keyExtractor={(_, i) => i.toString()}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity
+                className="m-1 rounded-xl overflow-hidden"
+                onPress={() => handleSelectBackground(index)}
+              >
+                <Image
+                  source={item}
+                  className="size-[75px]"
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+            )}
+            contentContainerStyle={{ padding: 8 }}
+            ListEmptyComponent={
+              <View className="items-center justify-center p-5 bg-gray-200/90 rounded-xl">
+                <Text className="text-gray-600 text-xl">
+                  Non sono disponibili backgrounds
+                </Text>
+              </View>
+            }
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
