@@ -19,6 +19,7 @@ import TodoItem from "../components/TodoItem";
 import TodoStats from "../components/TodoStats";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Asset } from "expo-asset";
+import * as Haptics from "expo-haptics";
 import { BackgroundContext, BACKGROUNDS, THUMB_BACKGROUNDS } from "./_layout";
 
 export default function Home() {
@@ -65,6 +66,9 @@ export default function Home() {
   const handleToggle = async (id: string) => {
     const todo = todos.find((t) => t.id === id);
     if (todo) {
+      if (!todo.completed) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
       const updated = { ...todo, completed: !todo.completed };
       const newTodos = await updateTodo(updated);
       setTodos(newTodos);

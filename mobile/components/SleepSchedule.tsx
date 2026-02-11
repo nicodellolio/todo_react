@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useEffect, useState } from "react";
+import * as Haptics from "expo-haptics";
 import {
   getSleepResults,
   saveSleepResults,
@@ -65,6 +66,7 @@ export default function SleepSchedule() {
 
   const handleSleepStart = () => {
     if (!sleepStart) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       const start = new Date();
       setCurrentTime(start.toLocaleTimeString("it-IT"));
       setSleepStart(start);
@@ -75,6 +77,7 @@ export default function SleepSchedule() {
 
   const handleWakeUp = () => {
     if (sleepStart) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       const sleepEnd = new Date();
       const diffMs = sleepEnd.getTime() - sleepStart.getTime();
       const formatted = formatDuration(diffMs);
