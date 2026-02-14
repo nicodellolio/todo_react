@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Animated,
   Image,
+  Alert,
 } from "react-native";
 import { useState, useCallback, useContext, useRef, useEffect } from "react";
 import { Link, useFocusEffect } from "expo-router";
@@ -34,10 +35,24 @@ export default function Home() {
   const [toggleMenu, setToggleMenu] = useState<boolean>(false);
   const [toggleBackgroundGrid, setToggleBackgroundGrid] =
     useState<boolean>(false);
+  const [showTrash, setShowTrash] = useState<boolean>(false);
+  const [trashDisabled, setTrashDisabled] = useState<boolean>(false);
 
   const background = useContext(BackgroundContext);
   const changingBgAnim = useRef(new Animated.Value(0)).current;
   const menuAnim = useRef(new Animated.Value(0)).current;
+
+  // Ref per tenere traccia dell'ultimo swipe aperto
+  const currentSwipeableRef = useRef<any>(null);
+
+  // Funzione per gestire l'apertura di un nuovo swipe
+  const handleSwipeOpen = (ref: any) => {
+    if (currentSwipeableRef.current && currentSwipeableRef.current !== ref) {
+      currentSwipeableRef.current.close();
+    }
+    currentSwipeableRef.current = ref;
+  };
+
   const todayDate = new Date()
     .toLocaleDateString("it-IT", {
       weekday: "long",
@@ -93,8 +108,17 @@ export default function Home() {
   };
 
   const handleClearCompleted = async () => {
-    const newTodos = await clearCompletedTodos();
-    setTodos(newTodos);
+    Alert.alert("Conferma", "Vuoi eliminare tutte le attività completate?", [
+      { text: "Annulla", style: "cancel" },
+      {
+        text: "Elimina",
+        style: "destructive",
+        onPress: async () => {
+          const newTodos = await clearCompletedTodos();
+          setTodos(newTodos);
+        },
+      },
+    ]);
   };
 
   const stats: TodoStatsType = {
@@ -111,6 +135,14 @@ export default function Home() {
     mediumPriority: todos.filter((t) => t.priority === "medium").length,
     lowPriority: todos.filter((t) => t.priority === "low").length,
   };
+
+  useEffect(() => {
+    if (stats.completed) {
+      setShowTrash(true);
+    } else {
+      setShowTrash(false);
+    }
+  }, [stats]);
 
   const todosFiltered =
     filter == "pending"
@@ -175,7 +207,7 @@ export default function Home() {
         <Text className="leading-none text-5xl font-bold text-white">
           Attività di oggi
         </Text>
-        <Link href="/add" onPress={()=>setToggleMenu(false)} asChild>
+        <Link href="/add" onPress={() => setToggleMenu(false)} asChild>
           <TouchableOpacity className="bg-blue-600 mt-2 px-4 py-[8px] rounded-full mb-3">
             <Text className="text-white text-xl font-bold">+</Text>
           </TouchableOpacity>
@@ -198,6 +230,7 @@ export default function Home() {
             onToggle={handleToggle}
             onDelete={handleDelete}
             onSetToday={handleSetToday}
+            onSwipeStart={handleSwipeOpen}
           />
         )}
         contentContainerStyle={{ paddingBottom: 100 }}
@@ -211,18 +244,27 @@ export default function Home() {
         }
       />
 
-      {stats.completed > 0 && (
-        <View className="absolute bottom-6 left-0 right-0 items-center">
-          <TouchableOpacity
-            onPress={handleClearCompleted}
-            className="bg-red-500 px-6 py-3 rounded-full shadow-lg"
-          >
-            <Text className="text-white font-bold">Elimina completate</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
       <View className="absolute bottom-10 right-5 items-center flex-row">
+        {showTrash && (
+          <>
+            <View
+              className={`absolute items-center 
+              ${toggleBackgroundGrid ? "bottom-0 left-3 opacity-20" : "bottom-20 right-0"}`}
+            >
+              <TouchableOpacity
+                disabled={toggleBackgroundGrid}
+                onPress={handleClearCompleted}
+                className="py-4 rounded-full shadow-lg"
+              >
+                <Image
+                  className="size-[46px]"
+                  source={require("../assets/bin.png")}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
         <Animated.View
           style={{
             opacity: menuAnim,
@@ -298,14 +340,28 @@ export default function Home() {
         </Animated.View>
         <TouchableOpacity
           onPress={() => {
-            setToggleMenu((prev) => !prev);
-            setToggleBackgroundGrid(false);
+            if (toggleBackgroundGrid) {
+              setToggleBackgroundGrid(false);
+            } else {
+              setToggleMenu((prev) => !prev);
+            }
+            // setToggleBackgroundGrid(false);
+          }}
+          style={{
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 10,
+            },
+            shadowOpacity: 0.51,
+            shadowRadius: 13.16,
+            elevation: 20,
           }}
           className={`bg-blue-600/90 rounded-full mb-[11px]
-              ${toggleMenu ? "px-[15px] py-[10px] " : "px-[8px] pb-[5px] pt-[7px]"}`}
+              ${toggleMenu || toggleBackgroundGrid ? "px-[15px] py-[10px] " : "px-[8px] pb-[5px] pt-[7px]"}`}
         >
           <Animated.Text
-            className={`${toggleMenu ? "text-3xl" : "text-5xl"} text-white`}
+            className={`${toggleMenu || toggleBackgroundGrid ? "text-3xl" : "text-5xl"} text-white hamburger`}
             style={{
               transform: [
                 {
@@ -317,7 +373,7 @@ export default function Home() {
               ],
             }}
           >
-            {toggleMenu ? "✕" : "☰"}
+            {toggleMenu || toggleBackgroundGrid ? "✕" : "☰"}
           </Animated.Text>
         </TouchableOpacity>
       </View>

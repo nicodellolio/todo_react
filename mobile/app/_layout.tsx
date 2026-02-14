@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { ImageBackground, View } from "react-native";
 import { createContext, useEffect, useMemo, useState } from "react";
 import * as SplashScreen from "expo-splash-screen";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -97,13 +98,13 @@ export default function Layout() {
   }, []);
 
   return (
-    <BackgroundContext.Provider value={value}>
-      <View className="flex-1">
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BackgroundContext.Provider value={value}>
         <StatusBar style="light" />
         <ImageBackground
           source={BACKGROUNDS[index]}
-          resizeMode="cover"
           className="flex-1"
+          resizeMode="cover"
         >
           <View className="flex-1 bg-black/40">
             <Stack
@@ -114,7 +115,7 @@ export default function Layout() {
             />
           </View>
         </ImageBackground>
-      </View>
-    </BackgroundContext.Provider>
+      </BackgroundContext.Provider>
+    </GestureHandlerRootView>
   );
 }

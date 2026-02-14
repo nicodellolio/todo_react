@@ -58,7 +58,7 @@ export default function EditTodo() {
       </View>
 
       <View className="p-6">
-        <Text className="text-gray-600 mb-2 font-medium">Descrizione attività</Text>
+        <Text className="text-white mb-2 font-bold text-lg">Descrizione attività</Text>
         <TextInput
           className="bg-gray-50 border border-gray-200 px-3 pb-3 h-[40px] rounded-xl text-lg mb-6"
           value={text}
@@ -68,7 +68,7 @@ export default function EditTodo() {
           onSubmitEditing={handleSave}
         />
 
-        <Text className="text-gray-600 mb-2 font-medium">Priorità</Text>
+        <Text className="text-white mb-2 font-bold text-lg">Priorità</Text>
         <View className="flex-row mb-6">
           <TouchableOpacity
             onPress={() => setPriority('low')}
