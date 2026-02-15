@@ -8,7 +8,6 @@ function TodoItem({ item, completedTodo }) {
     const priorityLetter = priority == "bassa" ? "B" : priority == "media" ? "M" : "A"
 
     function handleCompletedTodo(id) {
-        // console.log('id: ', id, '\nitemToDelete: ', itemToDelete);
         completedTodo(id)
     }
 

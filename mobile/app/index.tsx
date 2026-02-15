@@ -38,14 +38,25 @@ export default function Home() {
   const [showTrash, setShowTrash] = useState<boolean>(false);
   const [trashDisabled, setTrashDisabled] = useState<boolean>(false);
 
+  //overlay animation
+  const overlayAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(overlayAnim, {
+      toValue: toggleMenu || toggleBackgroundGrid ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [toggleMenu, toggleBackgroundGrid, overlayAnim]);
+
   const background = useContext(BackgroundContext);
   const changingBgAnim = useRef(new Animated.Value(0)).current;
   const menuAnim = useRef(new Animated.Value(0)).current;
 
-  // Ref per tenere traccia dell'ultimo swipe aperto
+  //Ref per tenere traccia dell'ultimo swipe aperto
   const currentSwipeableRef = useRef<any>(null);
 
-  // Funzione per gestire l'apertura di un nuovo swipe
+  //funzione per gestire l'apertura di un nuovo swipe
   const handleSwipeOpen = (ref: any) => {
     if (currentSwipeableRef.current && currentSwipeableRef.current !== ref) {
       currentSwipeableRef.current.close();
@@ -213,6 +224,24 @@ export default function Home() {
           </TouchableOpacity>
         </Link>
       </View>
+
+      {/* Dark Overlay when menu is active */}
+      <Animated.View
+        pointerEvents={toggleMenu || toggleBackgroundGrid ? "auto" : "none"}
+        style={{
+          opacity: overlayAnim,
+        }}
+        className="absolute inset-0 bg-black/80 z-10 w-[200%] h-[200%] -top-20 -left-20"
+      >
+        <TouchableOpacity
+          className="flex-1"
+          onPress={() => {
+            setToggleMenu(false);
+            setToggleBackgroundGrid(false);
+          }}
+        />
+      </Animated.View>
+
       <Text className="leading-none text-3xl font-bold text-white ms-1">
         {todayDate}
       </Text>
@@ -244,7 +273,7 @@ export default function Home() {
         }
       />
 
-      <View className="absolute bottom-10 right-5 items-center flex-row">
+      <View className="absolute bottom-5 right-5 items-center flex-row z-20">
         {showTrash && (
           <>
             <View
@@ -278,64 +307,52 @@ export default function Home() {
             ],
           }}
         >
-          <View className="gap-x-1 mb-3 items-end flex flex-row me-1">
-            <Link
-              onPress={() => setToggleMenu(false)}
-              href="/sleep-schedule"
-              asChild
-            >
-              <TouchableOpacity className="bg-pink-500 rounded-full px-3 py-2">
-                <Text className="text-4xl px-[3px] text-white">
-                  <Text className="text-[18px]"> Sleeping Schedule</Text>
-                </Text>
-              </TouchableOpacity>
-            </Link>
-
-            {changingBgVisible ? (
-              <Animated.View
-                className="items-center gap-3 flex flex-row bg-green-700 py-2 px-3 rounded-full"
-                style={{
-                  opacity: changingBgAnim,
-                  transform: [
-                    {
-                      translateX: changingBgAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [60, 0],
-                      }),
-                    },
-                    {
-                      scale: changingBgAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0.5, 1],
-                      }),
-                    },
-                  ],
-                }}
+          <View className="gap-x-1 me-1 flex-row mb-4">
+            <View className="gap-y-2">
+              <Link
+                onPress={() => setToggleMenu(false)}
+                href="/sleep-schedule"
+                asChild
               >
-                <View
-                  className="w-[30px] h-[30px] rounded-full border-2 border-transparent animate-spin"
-                  style={{
-                    borderTopColor: "#cecfffff",
-                    borderRightColor: "#cecfffff",
-                  }}
-                />
-                <Text className="text-2xl text-white">
-                  Aggiornando lo sfondo
-                </Text>
-              </Animated.View>
-            ) : (
+                <TouchableOpacity className="bg-pink-500 rounded-full px-3 py-2">
+                  <Text className="text-xl px-[3px] text-white">
+                    Sleeping Schedule
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+
+              <Link onPress={() => setToggleMenu(false)} href="/" asChild>
+                <TouchableOpacity className="bg-green-700 rounded-full px-3 py-2">
+                  <Text className="text-xl px-[3px] text-white">
+                    Coming Soon
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+
+            <View className="gap-y-2">
+              <Link
+                onPress={() => setToggleMenu(false)}
+                href="/daily-routine"
+                asChild
+              >
+                <TouchableOpacity className="bg-green-700 rounded-full px-3 py-2">
+                  <Text className="text-xl px-[3px] text-white">
+                    Daily Routine
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+
               <TouchableOpacity
-                className="bg-green-600 rounded-full py-[12px] px-3 w-100"
+                className="bg-green-700 rounded-full py-2 px-3 w-100"
                 onPress={() => {
                   setToggleBackgroundGrid((prev) => !prev);
                   setToggleMenu(false);
                 }}
               >
-                <Text className="text-3xl text-white">
-                  <Text className="text-xl">Cambia Background</Text>
-                </Text>
+                <Text className="text-xl px-[3px] text-white">Cambia Background</Text>
               </TouchableOpacity>
-            )}
+            </View>
           </View>
         </Animated.View>
         <TouchableOpacity
@@ -345,7 +362,7 @@ export default function Home() {
             } else {
               setToggleMenu((prev) => !prev);
             }
-            // setToggleBackgroundGrid(false);
+            //setToggleBackgroundGrid(false);
           }}
           style={{
             shadowColor: "#000",
@@ -378,7 +395,7 @@ export default function Home() {
         </TouchableOpacity>
       </View>
       {toggleBackgroundGrid && (
-        <View className="absolute bottom-20 mb-10 right-6 shadow h-[300px] w-[350px] bg-white/30 rounded-2xl pe-4">
+        <View className="absolute bottom-20 mb-10 right-6 shadow h-[300px] w-[350px] bg-white/30 rounded-2xl pe-4 z-30">
           <FlatList
             data={THUMB_BACKGROUNDS}
             numColumns={4}

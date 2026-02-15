@@ -16,6 +16,15 @@ export type TodoStats = {
   lowPriority: number;
 };
 
+export type Routine = {
+  id: string;
+  text: string;
+  completed: boolean;
+  createdAt: string;
+  priority: 'low' | 'medium' | 'high';
+  duration: number;
+};
+
 export type SleepResult = {
   id: string;
   dateLabel: string;

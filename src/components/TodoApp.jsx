@@ -24,8 +24,8 @@ function TodoApp({setShowTodoApp}) {
     const [filter, setFilter] = useState('all') //all, completed, pending
 
     const completedTodo = (id) => {
-        // const newCompletedItem = todoItems.find((item) => item.id == id) //ignoriamoli per ora
-        // setCompletedTodo(prev => [...prev, newCompletedItem]) //ignoriamoli per ora
+        //const newCompletedItem = todoItems.find((item) => item.id == id) //ignoriamoli per ora
+        //setCompletedTodo(prev => [...prev, newCompletedItem]) //ignoriamoli per ora
         setTodoItems((prevItems) =>
             prevItems.map((prevItem) => {
                 return prevItem.id == id

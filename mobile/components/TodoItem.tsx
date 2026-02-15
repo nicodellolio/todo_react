@@ -84,7 +84,7 @@ export default function TodoItem({
               onToggle(todo.id);
             }
           }}
-          className={`${todo.completed ? "bg-red-500" : "bg-green-500"} ${expandedId === todo.id ? "h-[95%]" : "h-[87%]"} justify-center items-center w-20 pe-1 h-full rounded-xl`}
+          className={`${todo.completed ? "bg-red-500" : "bg-green-500"} justify-center items-center w-20 ps-1 rounded-xl ${expandedId === todo.id ? "h-[95%]" : "h-[87%]"}`}
         >
           <Text className="text-white font-bold">
             {todo.completed ? "Elimina" : "Completa"}

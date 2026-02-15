@@ -21,9 +21,9 @@ export default function EditTodo() {
         setText(found.text);
         setPriority(found.priority ?? 'medium');
       } else {
-        // Handle case where todo might be deleted or not found
-        // Alert.alert('Error', 'Todo not found'); 
-        // router.back();
+        //handle case where todo might be deleted or not found
+        //Alert.alert('Error', 'Todo not found'); 
+        //router.back();
       }
     };
     if (id) loadTodo();

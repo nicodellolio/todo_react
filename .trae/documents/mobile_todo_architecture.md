@@ -39,7 +39,7 @@ graph TD
 ### 4.1 AsyncStorage API
 
 ```typescript
-// Todo Item Type
+//TodoItem type
 type Todo = {
   id: string;
   text: string;
@@ -48,13 +48,13 @@ type Todo = {
   priority: 'low' | 'medium' | 'high';
 };
 
-// Storage Keys
+//storage seys
 const STORAGE_KEYS = {
   TODOS: '@todos',
   STATS: '@todo_stats'
 };
 
-// Stats Type
+//stats type
 type TodoStats = {
   total: number;
   completed: number;

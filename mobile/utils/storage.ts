@@ -1,11 +1,76 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Todo, SleepResult, ActiveSleepSession } from '../types';
+import { Todo, SleepResult, ActiveSleepSession, Routine } from '../types';
 
 const STORAGE_KEYS = {
   TODOS: '@todos',
+  ROUTINES: '@routines',
   SLEEP_RESULTS: '@sleep_results',
   LEGACY_SLEEP_RESULTS: '@sleepResults',
   ACTIVE_SLEEP_SESSION: '@active_sleep_session',
+};
+
+export const getRoutineItems = async (): Promise<Routine[]> => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(STORAGE_KEYS.ROUTINES);
+    return jsonValue != null ? JSON.parse(jsonValue) : [];
+  } catch (e) {
+    console.error('Error reading routines', e);
+    return [];
+  }
+};
+
+export const saveRoutineItems = async (routines: Routine[]) => {
+  try {
+    const jsonValue = JSON.stringify(routines);
+    await AsyncStorage.setItem(STORAGE_KEYS.ROUTINES, jsonValue);
+  } catch (e) {
+    console.error('Error saving routines', e);
+  }
+};
+
+export const addRoutineItem = async (routine: Routine) => {
+  const routines = await getRoutineItems();
+  const newRoutines = [...routines, routine];
+  await saveRoutineItems(newRoutines);
+  return newRoutines;
+};
+
+export const updateRoutineItem = async (updatedRoutine: Routine) => {
+  const routines = await getRoutineItems();
+  const newRoutines = routines.map((r) => (r.id === updatedRoutine.id ? updatedRoutine : r));
+  await saveRoutineItems(newRoutines);
+  return newRoutines;
+};
+
+export const deleteRoutineItem = async (id: string) => {
+  const routines = await getRoutineItems();
+  const newRoutines = routines.filter((r) => r.id !== id);
+  await saveRoutineItems(newRoutines);
+  return newRoutines;
+};
+
+export const resetRoutineDaily = async () => {
+  const routines = await getRoutineItems();
+  const newRoutines = routines.map((r) => ({ ...r, completed: false }));
+  await saveRoutineItems(newRoutines);
+  return newRoutines;
+};
+
+export const checkAndResetDailyRoutines = async () => {
+  try {
+    const today = new Date().toDateString();
+    const lastReset = await AsyncStorage.getItem('@last_reset_date');
+    
+    if (lastReset !== today) {
+      await resetRoutineDaily();
+      await AsyncStorage.setItem('@last_reset_date', today);
+      return true; // Indicates reset happened
+    }
+    return false;
+  } catch (e) {
+    console.error('Error checking daily reset', e);
+    return false;
+  }
 };
 
 export const getTodos = async (): Promise<Todo[]> => {
